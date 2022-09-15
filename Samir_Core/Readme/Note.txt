@@ -1,0 +1,5 @@
+Asp.net Core Using Angular Js
+--------------------------------------
+Step :1 Create Database
+Step :2 then Excute "Cretetable" script
+Step :3 Change Database name & Password in Connection String

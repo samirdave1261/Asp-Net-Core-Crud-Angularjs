@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Bind Page";
+}
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.min.js"></script>
+<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+
+    <h3 class="display-4">Geeks-Demo</h3>
+    <div ng-app="bind" ng-controller="mybind" ng-init="PageLoad();">
+        <table class="table" id="test">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col"># </th>
+                    <th scope="col">First name</th>
+                    <th scope="col">Last name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Mobile</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="ss in Databb">
+                    <td>{{$index+1}}</td>
+                    <td>{{ss.Fname}}</td>
+                    <td>{{ss.Lname}}</td>
+                    <td>{{ss.Email}}</td>
+                    <td>{{ss.mobile}}</td>
+                    <td>
+                        <button type="button" value="{{ss.RID}}" ng-click="edit(ss.RID);" class="btn btn-primary">Edit</button>
+                        <button type="button" value="{{ss.RID}}" ng-click="Delete(ss.RID);" class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript">
+        var app = angular.module('bind', []);
+        app.controller('mybind', function ($scope, $http) {
+            $scope.Databind = '';
+            $scope.Databb = [];
+            $scope.PageLoad = function () {
+                $scope.Bind();
+
+                $("#searchbar").on("keyup", function () { //table Search
+                   var value = $(this).val().toLowerCase();
+                   $("#test tr").filter(function () {
+                       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                   });
+                });
+            }
+            $scope.edit = function (id) {
+                window.location.href = '/Insert?' + window.btoa(id); // Id encryption using Window.btoa()
+            },
+            $scope.Bind = function () { //Data Bind
+                var post = $http({
+                    method: "GET",
+                    url: "Home/Bind_Data",
+                    dataType: 'json',
+                    headers: { "Content-Type": "application/json" }
+                });
+                post.success(function (data) {
+                    $scope.Databind = data;
+                    $scope.Databb = JSON.parse($scope.Databind);
+                });
+            },
+            $scope.Delete = function (id) {
+                $.post("Home/Delete", { delId: id }, function (data) {
+                    if (data == "Success") {
+                        $scope.Bind();
+                    }
+               });
+            }
+        });
+    </script>
+
+
+
+

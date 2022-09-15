@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Insert/Update";
+}
+<h3>@ViewData["Title"]</h3>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.min.js"></script>
+<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+
+
+<div ng-app="insertapp" ng-controller="myapp" ng-cloak ng-init="updaterecord();">
+    <div class="alert alert-success" id="test" style="display:none" role="alert">
+        Data {{msg}} Successfully
+    </div>
+    <div class="form-group">
+        <label for="formGroupExampleInput">First name</label>
+        <input type="text" class="form-control" ng-model="fname" placeholder="First name">
+    </div>
+    <div class="form-group">
+        <label for="formGroupExampleInput2">Last name </label>
+        <input type="text" class="form-control" ng-model="lname" placeholder="Last name">
+    </div>
+    <div class="form-group">
+        <label for="formGroupExampleInput2">Email</label>
+        <input type="text" class="form-control" ng-model="email" id="inputEmail3" placeholder="Email">
+    </div>
+    <div class="form-group">
+        <label for="formGroupExampleInput2">Mobile</label>
+        <input type="number" class="form-control" ng-model="mobile" maxlength="10" id="inputEmail3" placeholder="Mobile">
+    </div>
+    <button id="submit" class="btn btn-primary" ng-click="submitdata('insert')" type="submit">Insert</button>
+    <button id="update" class="btn btn-primary" style="display:none;" ng-click="submitdata('update')" type="button">Update</button>
+</div>
+
+
+<script type="text/javascript">
+    var app = angular.module('insertapp', []);
+    app.controller('myapp', function ($scope, $http) {
+        $scope.Databind = '';
+        $scope.Data = '';
+        $scope.fname = '';
+        $scope.lname = '';
+        $scope.email = '';
+        $scope.mobile = '';
+        $scope.updaterecord = function () {
+            var Getparam = window.atob(window.location.search.substring(1)) // Id Decryption using Window.atob()
+            $scope.Get_Id_Data(Getparam);
+        }
+        $scope.submitdata = function (type) {
+            if (type == 'insert') {
+                $.ajax({
+                    url: "Home/Insert_Data",
+                    method: "POST",
+                    dataType: 'json',
+                    data: {
+                        fname: $scope.fname,
+                        lname: $scope.lname,
+                        email: $scope.email,
+                        mobile: $scope.mobile,
+                    },
+                    success: function (data) {
+                        if (data == "Success") {
+                            $scope.msg = "Insert";
+                            $("#test").css("display", "block");
+                            window.location.href = "/";
+                        }
+                    },
+                });
+            }
+            else if (type == 'update') {
+                $.ajax({
+                    url: "Home/Update",
+                    method: "POST",
+                    dataType: 'json',
+                    data: {
+                        fname: $scope.fname,
+                        lname: $scope.lname,
+                        email: $scope.email,
+                        mobile: $scope.mobile,
+                    },
+                    success: function (data) {
+                        if (data == "Success") {
+                            $scope.msg = "Update";
+                            $("#test").css("display", "block");
+                            window.location.href = "/";
+                        }
+                    },
+                });
+            }
+        }
+       
+        $scope.Get_Id_Data = function (id) {
+            if (id != '') {
+                $('#submit').css('display', 'none');
+                $('#update').css('display', 'block');
+                var getdata = $http({
+                    method: "GET",
+                    url: "Home/get_data?id=" + id,
+                    dataType: 'json',
+                    //data: { orderid: id },
+                    headers: { "Content-Type": "application/json" }
+                });
+                getdata.success(function (data) {
+                    $scope.Databind = data;
+                    $scope.Data = JSON.parse($scope.Databind);
+                    $scope.fname = $scope.Data[0].Fname,
+                    $scope.lname = $scope.Data[0].Lname,
+                    $scope.email = $scope.Data[0].Email,
+                    $scope.mobile = $scope.Data[0].mobile
+                });
+            }
+        }
+    });
+</script>
